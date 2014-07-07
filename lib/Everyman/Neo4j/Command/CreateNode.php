@@ -68,6 +68,12 @@ class CreateNode extends Command
 		if ((int)($code / 100) != 2) {
 			$this->throwException('Unable to create node', $code, $headers, $data);
 		}
+		
+		// Note: even if a HTTP code 200 is returned, we might still have an error.
+		// Let's throw it.
+		if (isset($data['body']['exception'])) {
+			$this->throwException($data['body']['message'], $code, $headers, $data);
+		}
 
 		$nodeId = $this->getEntityMapper()->getIdFromUri($headers['Location']);
 		$this->node->setId($nodeId);
